@@ -1,6 +1,7 @@
 import easygui
 import os
 import re
+from PySide6 import QtCore, QtWidgets, QtGui
 
 
 def getPath() -> str:
