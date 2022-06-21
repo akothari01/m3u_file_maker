@@ -5,24 +5,17 @@ import sys
 import easygui
 from PySide6.QtCore import Slot
 from PySide6.QtWidgets import QApplication, QPushButton, QLineEdit, QHBoxLayout, QLabel, \
-    QVBoxLayout, QDialog
+    QVBoxLayout, QDialog, QMessageBox
 
 
-def scanDirForCueFiles(pathDir: str) -> list[str]:
-    obj = os.scandir(pathDir)
-    fileNames = list[str]()
-    for entry in obj:
-        if entry.is_file() and entry.name[-3:] == 'cue':
-            fileNames.append(entry.name)
-            fileNames.append('\n')
-    fileNames.pop()
-    return fileNames
+
 
 
 class MainWindow(QDialog):
     def __init__(self):
         super().__init__()
-
+        self.setWindowTitle("m3u_file_maker_multi_disc_games")
+        self.setFixedWidth(600)
         self.editText = QLineEdit("Select your Directory")
         self.browseButton = QPushButton("Browse")
         self.browseButton.clicked.connect(self.getPath)
@@ -32,8 +25,8 @@ class MainWindow(QDialog):
 
         self.askText = QLabel("Is this the correct directory?")
         self.yesButton = QPushButton("Yes")
-
-        self.yesButton.clicked.connect(self.makeM3UFile)
+        self.yesButton.clicked.connect(lambda: self.makeM3UFile(self.scanDirForCueFiles(self.editText.text()),
+                                                                self.editText.text()))
         vLayout = QVBoxLayout()
         vLayout.addLayout(hLayout)
         vLayout.addWidget(self.askText)
@@ -43,8 +36,20 @@ class MainWindow(QDialog):
 
 
     @Slot()
-    def getPath(self) -> str:
-        return easygui.diropenbox()
+    def getPath(self):
+        self.editText.setText(easygui.diropenbox())
+
+
+    @Slot()
+    def scanDirForCueFiles(self, pathDir: str) -> list[str]:
+        obj = os.scandir(pathDir)
+        fileNames = list[str]()
+        for entry in obj:
+            if entry.is_file() and entry.name[-3:] == 'cue':
+                fileNames.append(entry.name)
+                fileNames.append('\n')
+        fileNames.pop()
+        return fileNames
 
 
     @Slot()
@@ -58,6 +63,9 @@ class MainWindow(QDialog):
         m3uFileName = addPath + '\\' + titleFile + '.m3u'
         m3uFile = open(m3uFileName, "w")
         m3uFile.writelines(names)
+        w = QMessageBox()
+        w.setText("Success")
+        w.exec()
 
 
 def main():
