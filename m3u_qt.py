@@ -8,9 +8,6 @@ from PySide6.QtWidgets import QApplication, QPushButton, QLineEdit, QHBoxLayout,
     QVBoxLayout, QDialog, QMessageBox
 
 
-
-
-
 class MainWindow(QDialog):
     def __init__(self):
         super().__init__()
@@ -66,6 +63,7 @@ class MainWindow(QDialog):
         w = QMessageBox()
         w.setText("Success")
         w.exec()
+        self.editText.setText("Select your Directory")
 
 
 def main():
